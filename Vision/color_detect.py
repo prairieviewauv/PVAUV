@@ -8,10 +8,10 @@ args = vars(ap.parse_args())
 
 image = cv2.imread(args["image"])
 
-boundaries = [0,121,255]
 
 
-BLAZE_ORANGE = np.array(boundaries,dtype="uint8")
+
+BLAZE_ORANGE = np.array([0,121,255],dtype="uint8")
    
 
 mask = cv2.inRange(image,lower,upper)
