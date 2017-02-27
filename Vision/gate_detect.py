@@ -5,7 +5,7 @@ import time
 
 
 #sets path to gate image cascade
-cascPath = sys.argv[1]
+#cascPath = sys.argv[1]
 
 #initializes farame capture from CAM_0
 cap = cv2.VideoCapture(0)
@@ -13,7 +13,7 @@ cap = cv2.VideoCapture(0)
 while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
-
+    """
     # Our operations on the frame come here
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
@@ -35,9 +35,9 @@ while(True):
 	for (x, y, w, h) in faces:
 	    cv2.rectangle(image, (x, y), (x+w, y+h), (0, 255, 0), 2)
 
-
+"""
     # Display the resulting frame
-    cv2.imshow('Frame',gray)
+    cv2.imshow('Frame',frame)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
