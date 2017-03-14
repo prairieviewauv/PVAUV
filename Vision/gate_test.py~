@@ -1,0 +1,39 @@
+import cv2
+import sys
+import time
+import imutils
+import argparse
+
+
+ap = argparse.ArgumentParser()
+ap.add_argument("-i","--image", required = True, help="path to input image")
+args = vars(ap.parse_args())
+
+
+height, width, chan = frame.shape()
+left = frame[0:height, 0:width/2]
+hsv_img = cv2.cvtColor(left, cvt.COLOR_BGR2HSV)
+
+#orange color range
+lower = np.array([0,160,160], dtype="uint8")
+upper = np.array([10,180,180], dtype="uint8")
+
+#thresholding to check if color in image
+mask = cv2.inRange(hsv_img, lower, upper)
+output = cv2.bitwise_and(hsv_image, hsv_image, mask=mask)
+
+
+thresh = cv2.threshold(output, 5, 255, cv2.THRESH_BINARY)[1]
+thresh = cv2.dilate(thresh,None, iterations=2)
+cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+
+cv2.drawContours(left, [c], -1, (0,255,0), 2)
+cv2.imshow('Frame',frame0)
+
+if cv2.waitKey(1) & 0xFF == ord('q'):
+	cap0.release()
+	cv2.destroyAllWindows()
+
+
+

@@ -10,8 +10,8 @@ class visualizer:
 
         #start video capture stream; return assertion if stream not started
         self.vidStream = cv2.VideoCapture(camera)
-        #if (!vidStream.isOpened()):
-         #   CV_Assert("I can't see out this eye!")
+        if (!vidStream.isOpened()):
+            CV_Assert("I can't see out this eye!")
 
         #intialize camera capture resolution and frame rate
         vidStream.set(CV_CAP_PROP_FRAME_WIDTH, wRes)
@@ -61,13 +61,23 @@ class visualizer:
         #thresholding to check if color in image
         mask = cv2.inRange(hsv_img, lower, upper)
         output = cv2.bitwise_and(hsv_image, hsv_image, mask=mask)
+        thresh = cv2.threshold(mask, 5, 255, cv2.THRESH_BINARY)[1]
+        thresh = cv2.dilate(thresh,None, iterations=2)
+                        
+        #finds contours (shape) of orange in image; if no contours found, gate not found
+        cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+        if len(cnts) > 2:
+            for c in cnts:
+                cv2.drawContours(left, [c], -1, (0,255,0), 2)
+            return True
 
+        else:
+            return False
         
-        #cv2.imshow("{0} detected".format(color), output)
-        return True
 
 
-    #detects 
+    #detects the left side of the validation gate by checking for orange on the left side of the captured frame
     def detectGateLeft(self):
         ret, frame = self.vidStream.read()
        
@@ -80,24 +90,24 @@ class visualizer:
         lower = np.array([5,50,50], dtype="uint8")
         upper = np.array([15,255,255], dtype="uint8")
 
-        #thresholding to check if color in image
+        #thresholding to ease contourig process
         mask = cv2.inRange(hsv_img, lower, upper)
         output = cv2.bitwise_and(hsv_img, hsv_img, mask=mask)
-
-
         thresh = cv2.threshold(mask, 5, 255, cv2.THRESH_BINARY)[1]
         thresh = cv2.dilate(thresh,None, iterations=2)
+                        
+        #finds contours (shape) of orange in image; if no contours found, gate not found
         cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts = cnts[0] if imutils.is_cv2() else cnts[1]
         if len(cnts) > 2:
             for c in cnts:
                 cv2.drawContours(left, [c], -1, (0,255,0), 2)
-            return "true"
+            return True
 
         else:
-            return "false"
+            return False
 
-
+    #detects the left side of the validation gate by checking for orange on the left side of the captured frame
     def detectGateRight(self):
         ret, frame = self.vidStream.read()
        
@@ -110,13 +120,13 @@ class visualizer:
         lower = np.array([5,50,50], dtype="uint8")
         upper = np.array([15,255,255], dtype="uint8")
 
-        #thresholding to check if color in image
+        #thresholding to ease contouring process
         mask = cv2.inRange(hsv_img, lower, upper)
         output = cv2.bitwise_and(hsv_img, hsv_img, mask=mask)
-
-
         thresh = cv2.threshold(mask, 5, 255, cv2.THRESH_BINARY)[1]
         thresh = cv2.dilate(thresh,None, iterations=2)
+        
+        #finds contours (shape) of orange in image; if no contours found, gate not found
         cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts = cnts[0] if imutils.is_cv2() else cnts[1]
         if len(cnts) > 2:
@@ -128,12 +138,58 @@ class visualizer:
             return "false"
 
 
-    def detectColor(self, color):
-        
-        return
-    
     def detectLine(self,color):
+        ret, frame = self.vidStream.read()
+       
+        frame = cv2.imread(args["image"])
+        height, width, chan = frame.shape
+        hsv_img = cv2.cvtColor(right, cv2.COLOR_BGR2HSV)
+
+        #orange color range
+        lower = np.array([5,50,50], dtype="uint8")
+        upper = np.array([15,255,255], dtype="uint8")
+
+        #thresholding to ease contouring process
+        mask = cv2.inRange(hsv_img, lower, upper)
+        output = cv2.bitwise_and(hsv_img, hsv_img, mask=mask)
+        thresh = cv2.threshold(mask, 5, 255, cv2.THRESH_BINARY)[1]
+        thresh = cv2.dilate(thresh,None, iterations=2)
+        
+        #finds contours (shape) of orange in image; if no contours found, gate not found
+        cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts = cnts[0] if imutils.is_cv2() else cnts[1]
         return
 
     def detectChannel(self):
         return
+
+    #returns center (x,y) for color target; can be used to set heading for contact with target
+    def lockOn(self, color):
+        frame = self.getFrame()
+        hsv_img = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
+
+        #color range
+        lower = np.array([5,50,50], dtype="uint8")
+        upper = np.array([15,255,255], dtype="uint8")
+
+        #thresholding to ease contouring process
+        mask = cv2.inRange(hsv_img, lower, upper)
+        output = cv2.bitwise_and(hsv_img, hsv_img, mask=mask)
+        thresh = cv2.threshold(mask, 5, 255, cv2.THRESH_BINARY)[1]
+        thresh = cv2.dilate(thresh,None, iterations=2)
+        
+        #finds contours (shape) of orange in image; if no contours found, gate not found
+        cnts = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts = cnts[0] if imutils.is_cv2() else cnts[1]
+
+        #center (x,y) for target
+        cX=0
+        cY=0
+        for c in cnts:
+          M = cv2.moments(c)
+          if (M['m00']==0):
+              M['m01']=1)
+              cX = int(M['m10']/M['m01'])
+              cY = int(M['m01']/M['m00'])
+
+        return cX, cY
