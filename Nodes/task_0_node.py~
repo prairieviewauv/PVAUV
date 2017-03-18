@@ -1,0 +1,24 @@
+import /../Vision/visualizer.py
+import rospy
+from actionlib_msgs.msg import GoalID, GoalStatus
+
+
+task_ID = rospy.Publisher('task_ID', GoalID, queue_size = 1)
+task_status = rospy.Publisher('task_status', GoalStatus, queue_size = 10)
+
+rospy.init_node('gate_finder_node')
+
+ID = 'task_0'
+status = 1
+task_ID.publish(ID)
+task_status.publish(status)
+viz_0 = visualizer(0)
+
+
+
+counter = 0
+
+while status = 1:
+	if viz_0.detectGateLeft():
+		if viz_0.detectGateRight():
+			
