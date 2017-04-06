@@ -1,0 +1,150 @@
+/*Arduino program to control the movement of thrusters for the sub
+1.The thruster node should receive the motion directions(forward,horizontal,updownard) as a string
+2.It also should receive two parameters for the direction of the movement,the parameters will determine the thrust
+*/
+
+#if (ARDUINO >= 100)
+ #include <Arduino.h>
+#else
+ #include <WProgram.h>
+#endif
+#include <Servo.h>
+#include <ros.h>
+#include <std_msgs/UInt16.h>
+#include <std_msgs/String.h>
+//Pin Set up
+const byte ledPin = 13;
+const byte forward_thruster1Pin=3;
+const byte forward_thruster2Pin=5;
+const byte horizontal_thruster1Pin=6;
+const byte horizontal_thruster2Pin=9;
+const byte updown_thruster1Pin=10;
+const byte updown_thruster2Pin=11;
+
+const int FULL_FORWARD = 1900;
+const int FULL_REVERSE = 1100;
+const int FULL_STOP    = 1500;
+#if (ARDUINO >= 100)
+ #include <Arduino.h>
+#else
+ #include <WProgram.h>
+#endif
+
+#include <Servo.h> 
+#include <ros.h>
+#include <std_msgs/UInt16.h>
+#include <std_msgs/String.h>
+Servo servo;
+Servo forward_thruster1;
+Servo forward_thruster2;
+Servo horizontal_thruster1;
+Servo horizontal_thruster2;
+Servo updown_thruster1;
+Servo updown_thruster2;
+std_msgs::String message;
+std_msgs::String leak_msgs;
+//ESC initialization
+void initializeESC() {
+  forward_thruster1.writeMicroseconds(FULL_STOP); // send "stop" signal to ESC.
+  forward_thruster2.writeMicroseconds(FULL_STOP); // send "stop" signal to ESC.
+  horizontal_thruster1.writeMicroseconds(FULL_STOP);
+  horizontal_thruster2.writeMicroseconds(FULL_STOP);
+  updown_thruster1.writeMicroseconds(FULL_STOP);
+  updown_thruster2.writeMicroseconds(FULL_STOP);
+  digitalWrite(ledPin, HIGH);
+  delay(500);
+  digitalWrite(ledPin, LOW);
+  delay(500);
+  digitalWrite(ledPin, HIGH);
+  delay(500);
+  digitalWrite(ledPin, LOW);
+  delay(500);
+  digitalWrite(ledPin, HIGH);
+  delay(5000); // delay to allow the ESC to recognize the stopped signal
+  digitalWrite(ledPin, LOW);
+}
+
+void fadeThrottle(int from, int to,Servo servo) {
+  int stepSize = from <= to ? 1 : -1;
+  
+  for (int i = from; i != to; i = i + stepSize) {
+    servo.writeMicroseconds(i);
+    delay(60); 
+  }
+}
+void forwardBackward_motion(int speed1,int speed2)
+{
+    fadeThrottle(speed1,speed2,forward_thruster1);
+    fadeThrottle(speed1,speed2,forward_thruster2);
+
+
+}
+void updown_motion(int speed1,int speed2)
+{
+    fadeThrottle(speed1,speed2,updown_thruster1);
+    fadeThrottle(speed1,speed2,updown_thruster2);
+
+
+}
+void horizontal_motion(int speed1,int speed2)
+{
+      fadeThrottle(speed1,speed2,horizontal_thruster1);
+      fadeThrottle(speed1,speed2,horizontal_thruster1);
+  
+}
+
+
+
+
+
+// Set up the LED pin and the servo pin, then initialize the ESC
+void setup() {
+  pinMode(ledPin, OUTPUT);
+  forward_thruster1.attach(forward_thruster1Pin);
+  forward_thruster2.attach(forward_thruster2Pin);
+  updown_thruster1.attach(updown_thruster1Pin);
+  updown_thruster2.attach(updown_thruster2Pin);
+  horizontal_thruster1.attach(horizontal_thruster1Pin);
+  horizontal_thruster2.attach(horizontal_thruster1Pin);  
+  initializeESC();
+}
+void leakage_detection()
+{
+int leakSensorPin=2;
+int leakState=digitalRead(leakSensorPin);
+  if(leakState==HIGH) { // action if water leakage
+
+   leak_msgs.data="wet";//leakage message to publish
+}
+else if(leakState==LOW){ // action if no water leakage
+
+    leak_msgs.data="dry";
+}
+}
+
+void depht()
+{
+ 
+  
+}
+
+
+// Throttle up to partial reverse then to zero, then partial forward, then to zero. 
+// Then wait 3 seconds.
+void loop() {
+  if(message.data="forward")
+  {
+    forwardBackward_motion(500,200);
+  }
+  else if(message.data="updown")
+  {
+    updown_motion(500,200);
+  }
+  else if(message.data="horizontal")
+  {
+    horizontal_motion(500,200);
+  }
+  leakage_detection();
+ }
+
+
