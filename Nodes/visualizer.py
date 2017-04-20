@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import cv2
 import imutils
 import numpy as np
@@ -6,8 +7,8 @@ import time
 
 
 class visualizer:
-    def __init__(self, frameRate=24, whRes=640, hRes = 480, camera=0):
-
+    def __init__(self, camera=0, frameRate=24, whRes=640, hRes = 480):
+	#
         #start video capture stream; return assertion if stream not started
         self.vidStream = cv2.VideoCapture(camera)
 
@@ -42,8 +43,6 @@ class visualizer:
         return frame
 
   
-
-
     #detects the left side of the validation gate/channel by checking for orange on the left side of the captured frame
     def detectGateLeft(self, color):
         ret, frame = self.vidStream.read()
@@ -104,6 +103,7 @@ class visualizer:
             return False
 
     #detects the bottom of the channel by checking for color on the left side of the captured frame
+   
     def detectGateBottom(self, color):
         ret, frame = self.vidStream.read()
         height, width, chan = frame.shape

@@ -1,13 +1,14 @@
+#!/usr/bin/env python
 from visualizer import visualizer
 import rospy
-from geometry_msgs.msg import Point, Pose, Quarternion, Twist
-from std_msgs.msg import Int8, String, Bool
+from geometry_msgs.msg import Twist
+from std_msgs.msg import Int8
 
 
 def channel_task():
     rospy.init_node("channel_task", anonymous=True)
     rate = rospy.Rate(10)
-    task_status = rospy.Publisher('channel_task/status', Int8, queuesize=1)
+    task_status = rospy.Publisher('channel_task/status', Int8, queue_size=1)
     movement = rospy.Publisher('/cmd_vel', Twist, queue_size = 1)
 
     motion  = Twist()
@@ -21,42 +22,41 @@ def channel_task():
     while not rospy.is_shutdown():
         
         while status == 1:
-            if viz_0.detectGateLeft():
-                    if viz_0.detectGateRight():
+            if viz_0.detectGateLeft("yellow"):
+		if viz_0.detectGateRight("yellow"):
 
                         #check to see if AUV is above bottom of the channel
                         while not above_gate:
-                            if viz_0.detectGatebottom()=0:
-                                above_gate=True
-                                motion.linear.x = 1.0
-                                motion.linear.y = 0.0
-                                motion.linear.z = 0.0
-                                motion.angular.x = 0.0
-                                motion.angular.y = 0.0
-                                motion.angular.z = 0.0 
-                                break
+                        	if viz_0.detectGateBottom("yellow")==0:
+		                        above_gate=True
+		                        motion.linear.x = 1.0
+		                        motion.linear.y = 0.0
+		                        motion.linear.z = 0.0
+		                        motion.angular.x = 0.0
+		                        motion.angular.y = 0.0
+		                        motion.angular.z = 0.0 
+		                        break
                         
                             #If auv is below bottom of channel, AUV ascends
-                            elif viz.detectGateBottom()=1:
-                                motion.linear.x = 0.0
-                                motion.linear.y = 0.0
-                                motion.linear.z = 1.0
-                                motion.angular.x = 0.0
-                                motion.angular.y = 0.0
-                                motion.angular.z = 0.0
-                                
-                                rospy.loginfo(motion)
-                                movement.publish(motion)
-                                rate.sleep()
-                                
-                        status = 2  
-                        rospy.loginfo(motion)
-                        movement.publish(motion)
-                        rate.sleep()
-                        break
-                
+				elif viz_0.detectGateBottom("yellow")==1:
+		                    	motion.linear.x = 0.0
+		                        motion.linear.y = 0.0
+		                        motion.linear.z = 1.0
+		                        motion.angular.x = 0.0
+		                        motion.angular.y = 0.0
+		                        motion.angular.z = 0.0
+		                        rospy.loginfo(motion)
+		                        movement.publish(motion)
+		                        rate.sleep()
+		                        
+				        status = 2  
+				        rospy.loginfo(motion)
+				        movement.publish(motion)
+				        rate.sleep()
+				        break
+		        
                 #turns the AUV left 45 deg in case right leg is not found
-                else:
+		else:
                         motion.linear.x = 0.0
                         motion.linear.y = 0.0
                         motion.linear.z = 0.0
@@ -88,10 +88,10 @@ def channel_task():
                         motion.angular.z = 0.0
                         counter = 0
                 
-                rospy.loginfo(motion)
-                movement.publish(motion)
-                rate.sleep()
-                continue
+	        rospy.loginfo(motion)
+	        movement.publish(motion)
+	        rate.sleep()
+	        continue
         
         rospy.loginfo(motion)
         movement.publish(motion)

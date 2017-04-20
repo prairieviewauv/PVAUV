@@ -1,10 +1,11 @@
+#!/usr/bin/env python
 from visualizer import visualizer
 import rospy
-from geometry_msgs.msg import Point, Pose, Quarternion, Twist
+from geometry_msgs.msg import Twist
 from std_msgs.msg import Int8, String, Bool
 
 def pathfinder_task():
-    ros.init_node("pathfinder_task", anonymous=True)
+    rospy.init_node("pathfinder_task", anonymous=True)
     rate = rospy.Rate(10)
     task_status = rospy.Publisher('pathfinder_task/status', Int8, queue_size = 10)
     movement = rospy.Publisher('/cmd_vel', Twist, queue_size = 1)
@@ -79,11 +80,11 @@ def pathfinder_task():
         task_status.publish(status)
         rate.sleep()
 
-        viz_0.__del__()
+        viz_1.__del__()
 
 if __name__ == '__main__':
     try:
-        gate_task()
+        pathfinder_task()
     except rospy.ROSInterruptException:
            pass
 

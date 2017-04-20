@@ -1,6 +1,7 @@
+#!/usr/bin/env python
 from visualizer import visualizer
 import rospy
-from geometry_msgs.msg import Point, Pose, Quarternion, Twist
+from geometry_msgs.msg import Point, Pose, Quaternion, Twist
 from std_msgs.msg import Int8, String, Bool
 
 def gate_task():
@@ -19,8 +20,8 @@ def gate_task():
     while not rospy.is_shutdown():
         
         while status == 1:
-            if viz_0.detectGateLeft():
-                    if viz_0.detectGateRight():
+            if viz_0.detectGateLeft("orange"):
+            	if viz_0.detectGateRight("orange"):
                         motion.linear.x = 1.0
                         motion.linear.y = 0.0
                         motion.linear.z = 0.0
@@ -28,25 +29,25 @@ def gate_task():
                         motion.angular.y = 0.0
                         motion.angular.z = 0.0
                 
-                    status = 2
-                    break		        
+                    	status = 2
+                    	break		        
                     
                         
                 #turns the AUV left 45 deg in case right leg is not found
-                else:
-                        motion.linear.x = 0.0
-                        motion.linear.y = 0.0
-                        motion.linear.z = 0.0
-                        motion.angular.x = 0.0
-                        motion.angular.y = 0.0
-                        motion.angular.z = 0.785
-                        movement.publish(motion)
+            	else:
+			motion.linear.x = 0.0
+			motion.linear.y = 0.0
+			motion.linear.z = 0.0
+			motion.angular.x = 0.0
+			motion.angular.y = 0.0
+			motion.angular.z = 0.785
+			movement.publish(motion)
             
-                    motion.angualar.z = 0.0
-                    rospy.loginfo(motion)
-                    movement.publish(motion)
-                    rate.sleep()
-                    continue
+			motion.angular.z = 0.0
+			rospy.loginfo(motion)
+			movement.publish(motion)
+			rate.sleep()
+			continue
             
             #turns the AUV right 45 deg in case left leg not found
             else:
@@ -66,6 +67,8 @@ def gate_task():
                         motion.angular.y = 0.0
                         motion.angular.z = 0.0
                         counter = 0
+                
+                motion.angular.z = 0.0
                 rospy.loginfo(motion)
                 movement.publish(motion)
                 rate.sleep()
