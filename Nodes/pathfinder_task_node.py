@@ -14,7 +14,7 @@ def pathfinder_task():
 
     status = 0
     task_status.publish(status)
-    viz_1 = visualizer(1)
+    viz_1 = visualizer(0)
 
     while not rospy.is_shutdown():
         while status != 3:

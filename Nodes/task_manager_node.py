@@ -24,38 +24,44 @@ def channel_task_callback(msg):
     rospy.loginfo(msg)
 
 def task_manager():
-    rospy.init_node("task_manager", anonymous=True)
+	rospy.init_node("task_manager", anonymous=True)
 
-    rospy.Subscriber("gate_task/status", Int8, gate_task_callback)
-    rospy.Subscriber("pathfinder_task/status", Int8, pathfinder_task_callback)
-    rospy.Subscriber("channel_task/status", Int8, channel_task_callback)
-    
-    package = "AUV"
+	rospy.Subscriber("gate_task/status", Int8, gate_task_callback)
+	rospy.Subscriber("pathfinder_task/status", Int8, pathfinder_task_callback)
+	rospy.Subscriber("channel_task/status", Int8, channel_task_callback)
 
-    executable = "gate_task_node.py"
-    node = roslaunch.core.Node(package, executable)
-    try:
-        process1 = launcher.launch(node)
-    except roslaunch.RLException as e:
-        rospy.logerr(e.message)
-    flag1 = gate_status
-    while flag1 != 2:
-        continue
-    process1.stop()
-	    
-   
-    executable = "pathfinder_task_node.py"
-    node = roslaunch.core.Node(package, executable)
-    try:
-        process2 = launcher.launch(node)
-    except roslaunch.RLException as e:
-        rospy.logerr(e.message)
-    flag2 = pathfinder_status
-    while flag2 != 3:
-        continue
-    process2.stop()	    
+	global gate_status
+	global pathfinder_status
+	global channel_status
 
-    
+	package = "auv"
+
+	executable = "gate_task_node.py"
+	node = roslaunch.core.Node(package, executable)
+	try:
+		process1 = launcher.launch(node)
+	except roslaunch.RLException as e:
+		rospy.logerr(e.message)
+	flag1 = gate_status
+	#rospy.sleep(5)
+	while flag1 != 2:
+		continue
+	process1.stop()
+		
+
+	executable = "pathfinder_task_node.py"
+	node = roslaunch.core.Node(package, executable)
+	try:
+		process2 = launcher.launch(node)
+	except roslaunch.RLException as e:
+		rospy.logerr(e.message)
+	flag2 = pathfinder_status
+	while flag2 != 3:
+		continue
+	#rospy.sleep(5)
+	process2.stop()	    
+
+		
 if __name__ == '__main__':
    launcher = roslaunch.scriptapi.ROSLaunch()
    launcher.start()
