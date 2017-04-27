@@ -1,0 +1,8 @@
+#define goal
+uint8 gate_task_completion
+---
+#define result
+uint8 current_goal_status
+---
+#define feedback
+uint8 end_goal_status
